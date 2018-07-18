@@ -111,3 +111,30 @@ func DeleteNode(nodePath string) error {
 	fmt.Printf("[%s] del!\n", nodePath)
 	return nil
 }
+
+//children watcher
+func Watcher(path string) (chan []string, chan error) {
+	change := make(chan []string, 10)
+	errors := make(chan error, 10)
+
+	go func() {
+		for {
+			c, _, events, err := conn.ChildrenW(path) //children watcher 一旦children有变化就会返回结果
+			if err != nil {
+				errors <- err
+				fmt.Printf("ChildrenW err: %+v\n", err)
+				continue
+			}
+
+			change <- c
+
+			evt := <-events
+			if evt.Err != nil {
+				errors <- evt.Err
+				fmt.Printf("evt.Err: %+v\n", evt.Err)
+			}
+		}
+	}()
+
+	return change, errors
+}
