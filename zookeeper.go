@@ -75,9 +75,9 @@ func IsExist(nodePath string) (bool, error) {
 	return flag, nil
 }
 
-//创建一个节点
-func CreatNode(nodePath, data string, ephemeral int32) error { //ephemeral 只有两个取值 0、1，==flags表示是否为临时节点 1是 0否
-	_, err := conn.Create(nodePath, []byte(data), ephemeral, zk.WorldACL(zk.PermAll)) //permission权限
+//创建一个节点 flags := int32(zk.FlagEphemeral)---zk.FlagSequence
+func CreatNode(nodePath, data string, flags int32) error { //==flags表示是否为临时节点
+	_, err := conn.Create(nodePath, []byte(data), flags, zk.WorldACL(zk.PermAll)) //permission权限
 	if err != nil {
 		if err.Error() == "zk: node already exists" {
 			fmt.Println("zk: node already exists.")
